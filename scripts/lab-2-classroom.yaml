@@ -1,0 +1,33 @@
+name: Autograding Tests
+"on":
+    - push
+    - repository_dispatch
+permissions:
+    checks: write
+    actions: read
+    contents: read
+jobs:
+    run-autograding-tests:
+        runs-on: ubuntu-latest
+        if: github.actor != 'github-classroom[bot]'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+            - uses: actions/setup-node@v5
+              with:
+                  node-version: 24.1.0
+            - name: Testcase 0
+              id: testcase-0
+              uses: classroom-resources/autograding-command-grader@v1
+              with:
+                  test-name: Testcase 0
+                  setup-command: ""
+                  command: cd Lab2 && ./validate.sh
+                  timeout: 10
+                  max-score: 100
+            - name: Autograding Reporter
+              uses: classroom-resources/autograding-grading-reporter@v1
+              env:
+                  TESTCASE-0_RESULTS: "${{steps.testcase-0.outputs.result}}"
+              with:
+                  runners: testcase-0
